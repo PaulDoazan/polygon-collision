@@ -35,9 +35,12 @@ function updateShape(e) {
     let g = tg.graphics;
 
     g.clear();
-    //g.beginStroke(tg.strokeColor);
     g.beginFill(tg.fillColor);
-    g.drawRect(tg.coords.x - side / 2, tg.coords.y - side / 2, tg.side, tg.side);
+    if (tg.provisoryCoords) {
+
+    } else {
+        g.drawRect(tg.coords.x - side / 2, tg.coords.y - side / 2, tg.side, tg.side);
+    }
 }
 
 function detectCollision(e, sh) {
