@@ -8,6 +8,7 @@ export function initialize() {
     // create a new stage and point it at our canvas:
     canvas = document.getElementById("canvas");
     stage = new createjs.Stage(canvas);
+    createjs.Touch.enable(stage);
 
 
     // add a text object to output the current FPS:
