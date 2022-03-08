@@ -4,14 +4,16 @@ let polygons = [];
 
 export default function root(stage) {
     let mainMc = new createjs.MovieClip();
+    mainMc.x = 50;
+    mainMc.y = 100;
     stage.addChild(mainMc);
 
     for (let l = 0; l < 30; l++) {
-        for (let c = 0; c < 50; c++) {
+        for (let c = 0; c < 60; c++) {
             let polygon = new Polygon();
 
-            polygon.x = (c + 1) * 20;
-            polygon.y = (l + 1) * 20;
+            polygon.x = (c + 1) * 15;
+            polygon.y = (l + 1) * 15;
 
             polygons.push(polygon);
 
