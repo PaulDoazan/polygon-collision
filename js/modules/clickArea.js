@@ -33,11 +33,18 @@ function onDown(e) {
 
     s.x = coords.x;
     s.y = coords.y;
+
+    let event = new createjs.Event("targetDown");
+    stage.dispatchEvent(event);
 }
 
 function onUp(e) {
     let tg = e.currentTarget;
+    let stage = tg.parent;
     tg.removeChild(tg.targetCircle);
+
+    let event = new createjs.Event("targetUp");
+    stage.dispatchEvent(event);
 }
 
 function onMove(e) {
