@@ -1,15 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Polygon Collision</title>
+    <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
+    <script type="module" src="./js/index.js"></script>
+    <script>
+        function init() {
+            var evt = new CustomEvent("canvasLoaded");
+            window.dispatchEvent(evt);
+        }
+    </script>
 </head>
 
-<body>
-
+<body onload="init();">
+    <canvas id="canvas" width="1024" height="768"></canvas>
 </body>
 
 </html>
