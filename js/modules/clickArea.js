@@ -34,6 +34,9 @@ function onDown(e) {
     s.x = coords.x;
     s.y = coords.y;
 
+    tg.prevX = s.x;
+    tg.prevY = s.y;
+
     let event = new createjs.Event("targetDown");
     stage.dispatchEvent(event);
 }
@@ -55,9 +58,19 @@ function onMove(e) {
     tg.targetCircle.x = coords.x;
     tg.targetCircle.y = coords.y;
 
+    let dx = coords.x - tg.prevX;
+    let dy = coords.y - tg.prevY;
+
+    tg.prevX = coords.x;
+    tg.prevY = coords.y;
+
+    let dist = Math.sqrt((dx * dx) + (dy * dy));
+    if(dist > 10) dist = 10;
+
     let event = new createjs.Event("targetMove");
     event.coords = coords;
     event.radius = radius;
+    event.speed = dist / 10; 
     stage.dispatchEvent(event);
 }
 
