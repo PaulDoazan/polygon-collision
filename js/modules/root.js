@@ -13,7 +13,14 @@ export default function root(stage) {
 
     for (let l = 0; l < 20; l++) {
         for (let c = 0; c < 30; c++) {
-            let polygon = new Polygon({ x: marginX + (c + 1) * size, y: marginY + (l + 1) * size }, stage);
+            //let _polygon = new Polygon({ x: marginX + (c + 1) * size, y: marginY + (l + 1) * size }, stage);
+            let coords = [
+                { x: marginX + (c + 1) * size - size / 2, y: marginY + (l + 1) * size - size / 2 },
+                { x: marginX + (c + 1) * size + size / 2, y: marginY + (l + 1) * size - size / 2 },
+                { x: marginX + (c + 1) * size + size / 2, y: marginY + (l + 1) * size + size / 2 },
+                { x: marginX + (c + 1) * size - size / 2, y: marginY + (l + 1) * size + size / 2 }
+            ]
+            let polygon = new Polygon(coords, stage);
             polygons.push(polygon);
             container.addChild(polygon);
         }
