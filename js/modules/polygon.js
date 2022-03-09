@@ -1,4 +1,4 @@
-let side = 24;
+let side = 39;
 let colors = ["#063e7b", "#ececd1", "#f0ce57", "#f45a3c", "#f09548"]
 let maxCount = 120;
 
