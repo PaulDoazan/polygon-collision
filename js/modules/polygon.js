@@ -1,4 +1,4 @@
-let side = 14;
+let side = 29;
 let colors = ["#063e7b", "#ececd1", "#f0ce57", "#f45a3c", "#f09548"]
 let maxCount = 120;
 
@@ -113,7 +113,8 @@ function detectCollision(e, sh) {
         let dy = e.coords.y - (collision.y);
         let distance = Math.sqrt((dx * dx) + (dy * dy));
 
-        let angle = Math.atan2(dy, dx);
+        // INSIDE ?????
+        let angle = collision.inside ? -Math.atan2(dy, dx) : e.angle;
         if (collision.inside) {
             /*let gr = new createjs.Graphics();
             let sha = new createjs.Shape(gr);
@@ -123,7 +124,7 @@ function detectCollision(e, sh) {
 
             sh.parent.addChild(sha);*/
 
-            angle += Math.PI
+            //angle += Math.PI
         }
 
         let projectedCoords = [];
@@ -131,7 +132,7 @@ function detectCollision(e, sh) {
         let radius = e.radius * (1 + 5 * e.speed);
 
         currentCoords.map((coord) => {
-            projectedCoords.push({ x: coord.x - Math.cos(angle) * radius, y: coord.y - Math.sin(angle) * radius })
+            projectedCoords.push({ x: coord.x + Math.cos(e.angle) * radius, y: coord.y + Math.sin(e.angle) * radius })
         })
 
         sh.projectedCoords = projectedCoords
