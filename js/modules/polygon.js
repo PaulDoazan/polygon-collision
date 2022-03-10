@@ -52,6 +52,7 @@ function onTargetMove(e, sh) {
 function onTargetUp(e, sh) {
     if (sh.projectedCoords && sh.projectedCoords[0].x !== sh.coords[0].y && sh.projectedCoords[0].y !== sh.coords[0].y) sh.count = 0;
     sh.projectedCoords = sh.coords;
+    sh.collided = false;
 }
 
 function updateShape(e) {
@@ -88,6 +89,7 @@ function updateShape(e) {
         } else {
             tg.updatedCoords = tg.projectedCoords;
             tg.projectedCoords = tg.interCoords = null;
+            tg.collided = false;
             tg.count = 0;
         }
     }
@@ -108,34 +110,31 @@ function detectCollision(e, sh) {
     // radii, the circles are touching!
 
     let collision = polygonCircle(currentCoords, e.coords.x, e.coords.y, e.radius);
-    if (collision) {
+    if (collision && !sh.collided) {
+        sh.collided = true;
         let dx = e.coords.x - (collision.x);
         let dy = e.coords.y - (collision.y);
         let distance = Math.sqrt((dx * dx) + (dy * dy));
 
         // INSIDE ?????
-        let angle = collision.inside ? -Math.atan2(dy, dx) : e.angle;
-        if (collision.inside) {
-            /*let gr = new createjs.Graphics();
-            let sha = new createjs.Shape(gr);
+        //let angle = collision.inside ? -Math.atan2(dy, dx) : e.angle;
+        /*let gr = new createjs.Graphics();
+        let sha = new createjs.Shape(gr);
 
-            gr.beginFill('blue');
-            gr.drawCircle(collision.x, collision.y, 5);
+        gr.beginFill('blue');
+        gr.drawCircle(collision.x, collision.y, 5);
 
-            sh.parent.addChild(sha);*/
-
-            //angle += Math.PI
-        }
+        sh.parent.addChild(sha);*/
 
         let projectedCoords = [];
 
-        let radius = e.radius * (1 + 5 * e.speed);
+        let radius = 30 * (1 + 5 * e.speed);
 
         currentCoords.map((coord) => {
             projectedCoords.push({ x: coord.x + Math.cos(e.angle) * radius, y: coord.y + Math.sin(e.angle) * radius })
         })
 
-        sh.projectedCoords = projectedCoords
+        sh.projectedCoords = projectedCoords;
         sh.count = 0;
     }
 }
@@ -267,9 +266,9 @@ function lineCircle(x1, y1, x2, y2, cx, cy, r) {
     let inside1 = pointCircle(x1, y1, cx, cy, r);
     let inside2 = pointCircle(x2, y2, cx, cy, r);
     if (inside1) {
-        return { x: x1, y: y1 };
+        return { x: x1, y: y1, inside: true };
     } else if (inside2) {
-        return { x: x2, y: y2 };
+        return { x: x2, y: y2, inside: true };
     }
 
     // get length of the line
@@ -296,7 +295,7 @@ function lineCircle(x1, y1, x2, y2, cx, cy, r) {
     let distance = Math.sqrt((distX * distX) + (distY * distY));
 
     if (distance <= r) {
-        return { x: closestX, y: closestY };
+        return { x: closestX, y: closestY, inside: true };
     }
     return false;
 }
