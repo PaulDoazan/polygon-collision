@@ -2,7 +2,7 @@ import Polygon from './polygon.js';
 import ClickArea from './clickArea.js';
 
 let polygons = [];
-let size = 30;
+let size = 50;
 let marginX = 200;
 let marginY = 60;
 
@@ -14,8 +14,8 @@ export default function root(stage) {
     stage.addChild(container);
     stage.polygons = polygons;
 
-    for (let l = 0; l < 20; l++) {
-        for (let c = 0; c < 20; c++) {
+    for (let l = 0; l < 12; l++) {
+        for (let c = 0; c < 12; c++) {
             let coords = [
                 { x: marginX + (c + 1) * size - size / 2, y: marginY + (l + 1) * size - size / 2 },
                 { x: marginX + (c + 1) * size + size / 2, y: marginY + (l + 1) * size - size / 2 },

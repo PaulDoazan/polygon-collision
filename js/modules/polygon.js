@@ -1,4 +1,4 @@
-let side = 29;
+let side = 49;
 let colors = ["#063e7b", "#ececd1", "#f0ce57", "#f45a3c", "#f09548"]
 let maxCount = 120;
 
@@ -124,15 +124,15 @@ function detectCollision(e, sh) {
         sh.parent.addChild(sha);*/
 
         let projectedCoords = [];
-        let projectionRadius = 40 * (1 + 2 * e.speed);
-        let random = getRandomIntInclusive(0, 10);
+        let projectionRadius = 30 * (1 + 5 * e.speed);
+        let random = getRandomIntInclusive(5, 10);
         let unit = getRandomIntInclusive(0, 1);
 
-        let randomAngle = unit ? (Math.PI / 2) * (random / 10) : -(Math.PI / 2) * (random / 10)
+        let randomAngle = unit ? (Math.PI / 4) * (random / 10) : -(Math.PI / 4) * (random / 10)
         let angle = e.angle + randomAngle;
 
-        let springBackX = Math.cos(e.angle) * (e.radius - distance) * 3;
-        let springBackY = Math.sin(e.angle) * (e.radius - distance) * 3;
+        let springBackX = Math.cos(e.angle) * (e.radius - distance) * 2;
+        let springBackY = Math.sin(e.angle) * (e.radius - distance) * 2;
 
         let springedBackCoords = [];
 
