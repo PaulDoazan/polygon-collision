@@ -1,4 +1,4 @@
-let side = 49;
+let side = 39;
 let colors = ["#063e7b", "#ececd1", "#f0ce57", "#f45a3c", "#f09548"]
 let maxCount = 120;
 
@@ -113,16 +113,7 @@ function detectCollision(e, sh) {
         let dy = e.coords.y - (collision.y);
         let distance = Math.sqrt((dx * dx) + (dy * dy));
 
-        // INSIDE ?????
-        //let angle = collision.inside ? -Math.atan2(dy, dx) : e.angle;
-        /*let gr = new createjs.Graphics();
-        let sha = new createjs.Shape(gr);
-
-        gr.beginFill('blue');
-        gr.drawCircle(collision.x, collision.y, 5);
-
-        sh.parent.addChild(sha);*/
-
+        // projection
         let projectedCoords = [];
         let projectionRadius = 30 * (1 + 5 * e.speed);
         let random = getRandomIntInclusive(5, 10);
@@ -142,10 +133,21 @@ function detectCollision(e, sh) {
 
         sh.updatedCoords = springedBackCoords;
 
+        //rotation
+        let center = get_polygon_centroid(currentCoords);
+        let ccx = center.x - (collision.x);
+        let ccy = center.y - (collision.y);
+
+        let angleCollisionCenter = Math.atan2(ccy, ccx);
+        let diffAngle = e.angle - angleCollisionCenter;
+
         currentCoords.map((coord) => {
-            projectedCoords.push({ x: coord.x + springBackX + Math.cos(angle) * projectionRadius, y: coord.y + springBackY + Math.sin(angle) * projectionRadius })
+            let newCoord = { x: coord.x + springBackX + Math.cos(angle) * projectionRadius, y: coord.y + springBackY + Math.sin(angle) * projectionRadius };
+            if (!sh.rotated) newCoord = rotate(center, newCoord, diffAngle)
+            projectedCoords.push(newCoord);
         })
 
+        //sh.rotated = true;
         sh.projectedCoords = projectedCoords;
         sh.count = 0;
     }
@@ -355,4 +357,31 @@ function dist(x1, y1, x2, y2) {
     let distX = x1 - x2;
     let distY = y1 - y2;
     return Math.sqrt((distX * distX) + (distY * distY));
+}
+
+function get_polygon_centroid(array) {
+    let pts = [...array]
+    let first = pts[0], last = pts[pts.length - 1];
+    if (first.x != last.x || first.y != last.y) pts.push(first);
+    let twicearea = 0,
+        x = 0, y = 0,
+        nPts = pts.length,
+        p1, p2, f;
+    for (let i = 0, j = nPts - 1; i < nPts; j = i++) {
+        p1 = pts[i]; p2 = pts[j];
+        f = p1.x * p2.y - p2.x * p1.y;
+        twicearea += f;
+        x += (p1.x + p2.x) * f;
+        y += (p1.y + p2.y) * f;
+    }
+    f = twicearea * 3;
+    return { x: x / f, y: y / f };
+}
+
+function rotate(center, point, angle) {
+    let cos = Math.cos(angle),
+        sin = Math.sin(angle),
+        nx = (cos * (point.x - center.x)) + (sin * (point.y - center.y)) + center.x,
+        ny = (cos * (point.y - center.y)) - (sin * (point.x - center.x)) + center.y;
+    return { x: nx, y: ny };
 }

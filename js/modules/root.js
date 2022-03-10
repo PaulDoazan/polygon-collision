@@ -2,8 +2,8 @@ import Polygon from './polygon.js';
 import ClickArea from './clickArea.js';
 
 let polygons = [];
-let size = 50;
-let marginX = 200;
+let size = 40;
+let marginX = 250;
 let marginY = 60;
 
 /*let marginX = 412;
