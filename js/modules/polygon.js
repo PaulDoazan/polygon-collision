@@ -52,7 +52,6 @@ function onTargetMove(e, sh) {
 function onTargetUp(e, sh) {
     if (sh.projectedCoords && sh.projectedCoords[0].x !== sh.coords[0].y && sh.projectedCoords[0].y !== sh.coords[0].y) sh.count = 0;
     sh.projectedCoords = sh.coords;
-    sh.collided = false;
 }
 
 function updateShape(e) {
@@ -89,7 +88,6 @@ function updateShape(e) {
         } else {
             tg.updatedCoords = tg.projectedCoords;
             tg.projectedCoords = tg.interCoords = null;
-            tg.collided = false;
             tg.count = 0;
         }
     }
@@ -110,8 +108,7 @@ function detectCollision(e, sh) {
     // radii, the circles are touching!
 
     let collision = polygonCircle(currentCoords, e.coords.x, e.coords.y, e.radius);
-    if (collision && !sh.collided) {
-        sh.collided = true;
+    if (collision) {
         let dx = e.coords.x - (collision.x);
         let dy = e.coords.y - (collision.y);
         let distance = Math.sqrt((dx * dx) + (dy * dy));
@@ -127,11 +124,26 @@ function detectCollision(e, sh) {
         sh.parent.addChild(sha);*/
 
         let projectedCoords = [];
+        let projectionRadius = 30 * (1 + 2 * e.speed);
+        let random = getRandomIntInclusive(0, 10);
+        let unit = getRandomIntInclusive(0, 1);
 
-        let radius = 30 * (1 + 5 * e.speed);
+        let randomAngle = unit ? (Math.PI / 2) * (random / 10) : -(Math.PI / 2) * (random / 10)
+        let angle = e.angle + randomAngle;
+
+        let springBackX = Math.cos(e.angle) * (e.radius - distance) * 5;
+        let springBackY = Math.sin(e.angle) * (e.radius - distance) * 5;
+
+        let springedBackCoords = [];
 
         currentCoords.map((coord) => {
-            projectedCoords.push({ x: coord.x + Math.cos(e.angle) * radius, y: coord.y + Math.sin(e.angle) * radius })
+            springedBackCoords.push({ x: coord.x + springBackX, y: coord.y + springBackY });
+        })
+
+        sh.updatedCoords = springedBackCoords;
+
+        currentCoords.map((coord) => {
+            projectedCoords.push({ x: coord.x + springBackX + Math.cos(angle) * projectionRadius, y: coord.y + springBackY + Math.sin(angle) * projectionRadius })
         })
 
         sh.projectedCoords = projectedCoords;
