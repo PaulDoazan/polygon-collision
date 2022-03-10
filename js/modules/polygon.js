@@ -143,11 +143,12 @@ function detectCollision(e, sh) {
 
         currentCoords.map((coord) => {
             let newCoord = { x: coord.x + springBackX + Math.cos(angle) * projectionRadius, y: coord.y + springBackY + Math.sin(angle) * projectionRadius };
-            if (!sh.rotated) newCoord = rotate(center, newCoord, diffAngle)
+            newCoord = rotate(center, newCoord, diffAngle)
             projectedCoords.push(newCoord);
         })
 
-        //sh.rotated = true;
+        let reversed = projectedCoords.splice(0, 1);
+        projectedCoords.push(reversed[0]);
         sh.projectedCoords = projectedCoords;
         sh.count = 0;
     }
