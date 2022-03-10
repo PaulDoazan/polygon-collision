@@ -25,12 +25,12 @@ function onDown(e) {
     let g = new createjs.Graphics();
     let s = new createjs.Shape(g);
 
-    tg.addChild(s);
+    //tg.addChild(s);
     tg.targetCircle = s;
 
-    g.setStrokeStyle(2);
+    /*g.setStrokeStyle(2);
     g.beginStroke("black");
-    g.drawCircle(0, 0, radius);
+    g.drawCircle(0, 0, radius);*/
 
     s.x = coords.x;
     s.y = coords.y;
@@ -67,7 +67,7 @@ function onMove(e) {
 
     let dist = Math.sqrt((dx * dx) + (dy * dy));
     let angle = Math.atan2(dy, dx);
-    if(dist > 10) dist = 10;
+    if (dist > 10) dist = 10;
 
     let event = new createjs.Event("targetMove");
     event.coords = coords;

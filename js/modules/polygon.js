@@ -124,15 +124,15 @@ function detectCollision(e, sh) {
         sh.parent.addChild(sha);*/
 
         let projectedCoords = [];
-        let projectionRadius = 30 * (1 + 2 * e.speed);
+        let projectionRadius = 40 * (1 + 2 * e.speed);
         let random = getRandomIntInclusive(0, 10);
         let unit = getRandomIntInclusive(0, 1);
 
         let randomAngle = unit ? (Math.PI / 2) * (random / 10) : -(Math.PI / 2) * (random / 10)
         let angle = e.angle + randomAngle;
 
-        let springBackX = Math.cos(e.angle) * (e.radius - distance) * 5;
-        let springBackY = Math.sin(e.angle) * (e.radius - distance) * 5;
+        let springBackX = Math.cos(e.angle) * (e.radius - distance) * 3;
+        let springBackY = Math.sin(e.angle) * (e.radius - distance) * 3;
 
         let springedBackCoords = [];
 
