@@ -1,14 +1,21 @@
 let side = 29;
 let colors = ["#063e7b", "#ececd1", "#f0ce57", "#f45a3c", "#f09548"]
 let maxCount = 120;
+let strStyle = 1;
 
-export default function polygon(coords, stage) {
+export default function polygon(polygon, stage) {
+    let coords = polygon.coords;
     let gr = new createjs.Graphics();
     let sh = new createjs.Shape(gr);
 
     let strokeColor = 'rgba(0,0,0,0.5)';
 
-    let fillColor = colors[getRandomIntInclusive(0, colors.length - 1)];
+    // let fillColor = colors[getRandomIntInclusive(0, colors.length - 1)];
+    let fillColor = polygon.color;
+    if (strStyle) {
+        gr.setStrokeStyle(strStyle);
+        gr.beginStroke(fillColor);
+    }
     gr.beginFill(fillColor);
     gr.moveTo(coords[0].x, coords[0].y);
 
@@ -77,6 +84,8 @@ function updateShape(e) {
             })
 
             g.clear();
+            g.setStrokeStyle(strStyle);
+            g.beginStroke(tg.fillColor);
             g.beginFill(tg.fillColor);
             g.moveTo(tg.interCoords[0].x, tg.interCoords[0].y);
 

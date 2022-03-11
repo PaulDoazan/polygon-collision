@@ -13,8 +13,8 @@ export function initialize() {
     // add a text object to output the current FPS:
     fpsLabel = new createjs.Text("-- fps", "bold 18px Arial", "#000");
     stage.addChild(fpsLabel);
-    fpsLabel.x = 490;
-    fpsLabel.y = 5;
+    fpsLabel.x = 20;
+    fpsLabel.y = 20;
 
     // start the tick and point it at the window so we can do some work before updating the stage:
     createjs.Ticker.timingMode = createjs.Ticker.RAF;
