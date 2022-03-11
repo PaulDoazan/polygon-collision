@@ -28,9 +28,9 @@ function onDown(e) {
     //tg.addChild(s);
     tg.targetCircle = s;
 
-    g.setStrokeStyle(2);
+    /*g.setStrokeStyle(2);
     g.beginStroke("black");
-    g.drawCircle(0, 0, radius);
+    g.drawCircle(0, 0, radius);*/
 
     s.x = coords.x;
     s.y = coords.y;
