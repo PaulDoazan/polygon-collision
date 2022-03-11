@@ -25,7 +25,7 @@ function onDown(e) {
     let g = new createjs.Graphics();
     let s = new createjs.Shape(g);
 
-    tg.addChild(s);
+    //tg.addChild(s);
     tg.targetCircle = s;
 
     g.setStrokeStyle(2);
