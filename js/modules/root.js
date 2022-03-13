@@ -1,6 +1,6 @@
 import Polygon from './polygon.js';
 import ClickArea from './clickArea.js';
-import ducuing from '../json/ducuing.json' assert { type: "json" };;
+import ducuing from '../json/example.json' assert { type: "json" };;
 //import ducuing from '../json/ducuing.json';
 
 let polygons = [];
