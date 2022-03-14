@@ -21,32 +21,6 @@ export default function root(stage) {
         polygons.push(polygon);
         container.addChild(polygon);
     })
-    ducuing.bottom.map((shape) => {
-        let polygon = new Polygon(shape, stage);
-        polygons.push(polygon);
-        container.addChild(polygon);
-    })
-    ducuing.mouth.map((shape) => {
-        let polygon = new Polygon(shape, stage);
-        polygons.push(polygon);
-        container.addChild(polygon);
-    })
-    ducuing.ears.map((shape) => {
-        let polygon = new Polygon(shape, stage);
-        polygons.push(polygon);
-        container.addChild(polygon);
-    })
-    ducuing.eyes.map((shape) => {
-        let polygon = new Polygon(shape, stage);
-        polygons.push(polygon);
-        container.addChild(polygon);
-    })
-    ducuing.hair.map((shape) => {
-        let polygon = new Polygon(shape, stage);
-        polygons.push(polygon);
-        container.addChild(polygon);
-    })
-
 
     let clickArea = new ClickArea();
     stage.addChild(clickArea);
