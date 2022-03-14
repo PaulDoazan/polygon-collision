@@ -47,8 +47,8 @@ function onUp(e) {
     let stage = tg.parent;
     tg.removeChild(tg.targetCircle);
 
-    let event = new createjs.Event("targetUp");
-    stage.dispatchEvent(event);
+    stage.dispatchEvent(new createjs.Event("changeCharacter"));
+    stage.dispatchEvent(new createjs.Event("targetUp"));
 }
 
 function onMove(e) {

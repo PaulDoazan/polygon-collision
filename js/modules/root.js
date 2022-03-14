@@ -1,9 +1,12 @@
 import Polygon from './polygon.js';
 import ClickArea from './clickArea.js';
-import ducuing from '../json/ducuing.json' assert { type: "json" };;
+import ducuing from '../json/ducuing.json' assert { type: "json" };
+import dubie from '../json/dubie.json' assert { type: "json" };
 //import ducuing from '../json/ducuing.json';
 
 let polygons = [];
+let characters = [ducuing, dubie];
+let indexCharacter = 0;
 let size = 30;
 let marginX = 275;
 let marginY = 100;
@@ -16,7 +19,7 @@ export default function root(stage) {
     stage.addChild(container);
     stage.polygons = polygons;
 
-    ducuing.default.map((shape) => {
+    characters[0].default.map((shape) => {
         let polygon = new Polygon(shape, stage);
         polygons.push(polygon);
         container.addChild(polygon);
@@ -24,4 +27,33 @@ export default function root(stage) {
 
     let clickArea = new ClickArea();
     stage.addChild(clickArea);
+
+    stage.on('changeCharacter', (e)=>{
+        changeCharacter(e, stage, container);
+    })
+}
+
+function changeCharacter(e, stage, container){
+    indexCharacter++;
+    if(indexCharacter >= characters.length) indexCharacter = 0;
+    let nextCharacter = characters[indexCharacter];
+    stage.polygons.map((polygon, index)=>{ 
+        if(index >= nextCharacter.default.length) return;
+        polygon.coords = nextCharacter.default[index].coords;
+        polygon.color = nextCharacter.default[index].color;
+    })
+
+    if(stage.polygons.length > nextCharacter.default.length){
+        for(let i = nextCharacter.default.length; i < stage.polygons.length; i++){
+            let polygon = stage.polygons[i];
+            container.removeChild(polygon);
+        }
+        stage.polygons.splice(nextCharacter.default.length - 1);
+    } else if(stage.polygons.length < nextCharacter.default.length){
+        for(let i = stage.polygons.length; i < nextCharacter.default.length; i++){
+            let polygon = new Polygon(nextCharacter.default[i], stage);
+            stage.polygons.push(polygon);
+            container.addChild(polygon);
+        }
+    }
 }

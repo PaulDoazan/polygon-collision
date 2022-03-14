@@ -59,6 +59,7 @@ function onTargetMove(e, sh) {
 function onTargetUp(e, sh) {
     if (sh.projectedCoords && sh.projectedCoords[0].x !== sh.coords[0].y && sh.projectedCoords[0].y !== sh.coords[0].y) sh.count = 0;
     sh.projectedCoords = sh.coords;
+    sh.fillColor = sh.color;
 }
 
 function updateShape(e) {
