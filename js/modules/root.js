@@ -28,30 +28,31 @@ export default function root(stage) {
     let clickArea = new ClickArea();
     stage.addChild(clickArea);
 
-    stage.on('changeCharacter', (e)=>{
+    stage.on('changeCharacter', (e) => {
         changeCharacter(e, stage, container);
     })
 }
 
-function changeCharacter(e, stage, container){
+function changeCharacter(e, stage, container) {
     indexCharacter++;
-    if(indexCharacter >= characters.length) indexCharacter = 0;
+    if (indexCharacter >= characters.length) indexCharacter = 0;
+
     let nextCharacter = characters[indexCharacter];
-    stage.polygons.map((polygon, index)=>{ 
-        if(index >= nextCharacter.default.length) return;
-        polygon.coords = nextCharacter.default[index].coords;
+    stage.polygons.map((polygon, index) => {
+        if (index >= nextCharacter.default.length) return;
+        polygon.coords = polygon.projectedCoords = nextCharacter.default[index].coords;
         polygon.color = nextCharacter.default[index].color;
     })
 
-    if(stage.polygons.length > nextCharacter.default.length){
-        for(let i = nextCharacter.default.length; i < stage.polygons.length; i++){
+    if (stage.polygons.length > nextCharacter.default.length) {
+        for (let i = nextCharacter.default.length; i <= stage.polygons.length; i++) {
             let polygon = stage.polygons[i];
             container.removeChild(polygon);
         }
-        stage.polygons.splice(nextCharacter.default.length - 1);
-    } else if(stage.polygons.length < nextCharacter.default.length){
-        for(let i = stage.polygons.length; i < nextCharacter.default.length; i++){
-            let polygon = new Polygon(nextCharacter.default[i], stage);
+        stage.polygons.splice(nextCharacter.default.length);
+    } else if (stage.polygons.length < nextCharacter.default.length) {
+        for (let i = stage.polygons.length; i < nextCharacter.default.length; i++) {
+            let polygon = new Polygon(nextCharacter.default[i], stage, true);
             stage.polygons.push(polygon);
             container.addChild(polygon);
         }

@@ -40,6 +40,8 @@ function onDown(e) {
 
     let event = new createjs.Event("targetDown");
     stage.dispatchEvent(event);
+
+    onMove(e);
 }
 
 function onUp(e) {
@@ -61,6 +63,10 @@ function onMove(e) {
 
     let dx = coords.x - tg.prevX;
     let dy = coords.y - tg.prevY;
+
+    if (dx === 0 && dy === 0) {
+        dx = dy = 1;
+    }
 
     tg.prevX = coords.x;
     tg.prevY = coords.y;

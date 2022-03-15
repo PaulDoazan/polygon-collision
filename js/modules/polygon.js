@@ -3,7 +3,7 @@ let colors = ["#063e7b", "#ececd1", "#f0ce57", "#f45a3c", "#f09548"]
 let maxCount = 180;
 let strStyle = 1;
 
-export default function polygon(polygon, stage) {
+export default function polygon(polygon, stage, newProjectedCoords) {
     let coords = polygon.coords;
     let gr = new createjs.Graphics();
     let sh = new createjs.Shape(gr);
@@ -27,10 +27,31 @@ export default function polygon(polygon, stage) {
 
     sh.on('tick', updateShape)
     sh.side = side;
+
+    if (newProjectedCoords) {
+        let reversed = [];
+        coords.map((coord, index) => {
+            if (index > 0) {
+                reversed.push({ x: coord.x, y: coord.y });
+            }
+        })
+        reversed.push({ x: coords[0].x, y: coords[0].y });
+
+        let random = getRandomIntInclusive(50, 200);
+        let angle = getRandomIntInclusive(0, 314);
+
+        reversed.map((r) => {
+            r.x += Math.cos(angle / 100) * random;
+            r.y += Math.sin(angle / 100) * random;
+        })
+        sh.updatedCoords = reversed;
+    } else {
+        sh.projectedCoords = coords;
+    }
+
     sh.coords = coords;
-    sh.fillColor = fillColor;
+    sh.fillColor = sh.color = fillColor;
     sh.strokeColor = strokeColor;
-    sh.pace = getRandomIntInclusive(1, 4);
     sh.unit = 1;
 
     stage.on('targetDown', (e) => {
@@ -49,7 +70,7 @@ export default function polygon(polygon, stage) {
 }
 
 function onTargetDown(e, sh) {
-    //sh.count = 0;
+    //detectCollision(e, sh);
 }
 
 function onTargetMove(e, sh) {
@@ -57,7 +78,8 @@ function onTargetMove(e, sh) {
 }
 
 function onTargetUp(e, sh) {
-    if (sh.projectedCoords && sh.projectedCoords[0].x !== sh.coords[0].y && sh.projectedCoords[0].y !== sh.coords[0].y) sh.count = 0;
+    sh.count = 0;
+    //if (sh.projectedCoords && sh.projectedCoords[0].x !== sh.coords[0].y && sh.projectedCoords[0].y !== sh.coords[0].y) sh.count = 0;
     sh.projectedCoords = sh.coords;
     sh.fillColor = sh.color;
 }
