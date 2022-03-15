@@ -2,10 +2,12 @@ import Polygon from './polygon.js';
 import ClickArea from './clickArea.js';
 import ducuing from '../json/ducuing.json' assert { type: "json" };
 import dubie from '../json/dubie.json' assert { type: "json" };
+import poirot from '../json/poirot.json' assert { type: "json" };
+import woki from '../json/woki.json' assert { type: "json" };
 //import ducuing from '../json/ducuing.json';
 
 let polygons = [];
-let characters = [ducuing, dubie];
+let characters = [ducuing, poirot, dubie, woki];
 let indexCharacter = 0;
 let size = 30;
 let marginX = 275;
