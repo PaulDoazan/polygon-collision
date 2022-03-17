@@ -141,8 +141,6 @@ function updateShape(e) {
 
             tg.interColor = `rgb(${ interR },${ interG },${ interB })`;
 
-            console.log(startRed, projectedRed, interR);
-
             g.clear();
             g.setStrokeStyle(strStyle);
             g.beginStroke(tg.interColor);
