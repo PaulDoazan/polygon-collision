@@ -12,7 +12,7 @@ export function initialize() {
 
     // add a text object to output the current FPS:
     fpsLabel = new createjs.Text("-- fps", "bold 18px Arial", "#000");
-    //stage.addChild(fpsLabel);
+    stage.addChild(fpsLabel);
     fpsLabel.x = 20;
     fpsLabel.y = 20;
 
