@@ -3,8 +3,8 @@ let colors = ["#063e7b", "#ececd1", "#f0ce57", "#f45a3c", "#f09548"]
 let maxCount = 120;
 let strStyle = 1;
 
-export default function polygon(polygon, stage, newProjectedCoords) {
-    let coords = polygon.coords;
+export default function polygon(polygon, stage, newProjected) {
+    let poly = polygon;
     let gr = new createjs.Graphics();
     let sh = new createjs.Shape(gr);
 
@@ -17,9 +17,9 @@ export default function polygon(polygon, stage, newProjectedCoords) {
         gr.beginStroke(fillColor);
     }
     gr.beginFill(fillColor);
-    gr.moveTo(coords[0].x, coords[0].y);
+    gr.moveTo(poly.coords[0].x, poly.coords[0].y);
 
-    coords.map((coord, index) => {
+    poly.coords.map((coord, index) => {
         if (index > 0) {
             gr.lineTo(coord.x, coord.y);
         }
@@ -28,28 +28,28 @@ export default function polygon(polygon, stage, newProjectedCoords) {
     sh.on('tick', updateShape)
     sh.side = side;
 
-    if (newProjectedCoords) {
+    if (newProjected) {
         let reversed = [];
-        coords.map((coord, index) => {
+        poly.coords.map((coord, index) => {
             if (index > 0) {
-                reversed.push({ x: coord.x, y: coord.y });
+                reversed.push({coords:{ x: coord.x, y: coord.y }});
             }
         })
-        reversed.push({ x: coords[0].x, y: coords[0].y });
+        reversed.push({coords:{ x: poly.coords[0].x, y: poly.coords[0].y }});
 
         let random = getRandomIntInclusive(50, 200);
         let angle = getRandomIntInclusive(0, 314);
 
         reversed.map((r) => {
-            r.x += Math.cos(angle / 100) * random;
-            r.y += Math.sin(angle / 100) * random;
+            r.coords.x += Math.cos(angle / 100) * random;
+            r.coords.y += Math.sin(angle / 100) * random;
         })
-        sh.updatedCoords = reversed;
+        sh.updated = reversed;
     } else {
-        sh.projectedCoords = coords;
+        sh.projected = poly;
     }
 
-    sh.coords = coords;
+    sh.poly = poly;
     sh.fillColor = sh.color = fillColor;
     sh.strokeColor = strokeColor;
     sh.unit = 1;
@@ -79,8 +79,8 @@ function onTargetMove(e, sh) {
 
 function onTargetUp(e, sh) {
     sh.count = 0;
-    //if (sh.projectedCoords && sh.projectedCoords[0].x !== sh.coords[0].y && sh.projectedCoords[0].y !== sh.coords[0].y) sh.count = 0;
-    sh.projectedCoords = sh.coords;
+    //if (sh.projected && sh.projected[0].x !== sh.coords[0].y && sh.projected[0].y !== sh.coords[0].y) sh.count = 0;
+    sh.projected = {coords: sh.coords};
     sh.fillColor = sh.color;
 }
 
@@ -88,22 +88,22 @@ function updateShape(e) {
     let tg = e.currentTarget;
     let g = tg.graphics;
 
-    if (tg.projectedCoords) {
+    if (tg.projected) {
         if (tg.count < maxCount) {
             tg.count++;
             let factor = easeOutQuint(tg.count / maxCount);
-            let startingCoords;
+            let starting;
 
-            if (tg.updatedCoords) {
-                startingCoords = tg.updatedCoords;
+            if (tg.updated) {
+                starting = tg.updated;
             } else {
-                startingCoords = tg.coords;
+                starting = tg.poly;
             }
 
             tg.interCoords = [];
 
-            tg.projectedCoords.map((projected, i) => {
-                tg.interCoords.push({ x: startingCoords[i].x + (projected.x - startingCoords[i].x) * factor, y: startingCoords[i].y + (projected.y - startingCoords[i].y) * factor });
+            tg.projected.coords.map((projectedCoord, i) => {
+                tg.interCoords.push({ x: starting.coords[i].x + (projectedCoord.x - starting.coords[i].x) * factor, y: starting.coords[i].y + (projectedCoord.y - starting.coords[i].y) * factor });
             })
 
             g.clear();
@@ -118,35 +118,35 @@ function updateShape(e) {
                 }
             })
         } else {
-            tg.updatedCoords = tg.projectedCoords;
-            tg.projectedCoords = tg.interCoords = null;
+            tg.updated = tg.projected;
+            tg.projected = tg.interCoords = null;
             tg.count = 0;
         }
     }
 }
 
 function detectCollision(e, sh) {
-    let currentCoords;
+    let current;
     if (sh.interCoords) {
-        currentCoords = sh.interCoords;
-        sh.updatedCoords = sh.interCoords;
+        current.coords = sh.interCoords;
+        sh.updated.coords = sh.interCoords;
         sh.count = 0;
-    } else if (sh.updatedCoords) {
-        currentCoords = sh.updatedCoords;
+    } else if (sh.updated) {
+        current = sh.updated;
     } else {
-        currentCoords = sh.coords;
+        current = sh.poly;
     }
     // if the distance is less than the sum of the circle's
     // radii, the circles are touching!
 
-    let collision = polygonCircle(currentCoords, e.coords.x, e.coords.y, e.radius);
+    let collision = polygonCircle(current.coords, e.coords.x, e.coords.y, e.radius);
     if (collision) {
         let dx = e.coords.x - (collision.x);
         let dy = e.coords.y - (collision.y);
         let distance = Math.sqrt((dx * dx) + (dy * dy));
 
         // projection
-        let projectedCoords = [];
+        let projected = {coords: []};
         let projectionRadius = 30 * (1 + 5 * e.speed);
         let random = getRandomIntInclusive(5, 10);
         let unit = getRandomIntInclusive(0, 1);
@@ -157,31 +157,31 @@ function detectCollision(e, sh) {
         let springBackX = Math.cos(e.angle) * (e.radius - distance) * 2;
         let springBackY = Math.sin(e.angle) * (e.radius - distance) * 2;
 
-        let springedBackCoords = [];
+        let springedBack = {coords: []};
 
-        currentCoords.map((coord) => {
-            springedBackCoords.push({ x: coord.x + springBackX, y: coord.y + springBackY });
+        current.coords.map((coord) => {
+            springedBack.coords.push( { x: coord.x + springBackX, y: coord.y + springBackY });
         })
 
-        sh.updatedCoords = springedBackCoords;
+        sh.updated = springedBack;
 
         //rotation
-        let center = get_polygon_centroid(currentCoords);
+        let center = get_polygon_centroid(current.coords);
         let ccx = center.x - (collision.x);
         let ccy = center.y - (collision.y);
 
         let angleCollisionCenter = Math.atan2(ccy, ccx);
         let diffAngle = e.angle - angleCollisionCenter;
 
-        currentCoords.map((coord) => {
+        current.coords.map((coord) => {
             let newCoord = { x: coord.x + springBackX + Math.cos(angle) * projectionRadius, y: coord.y + springBackY + Math.sin(angle) * projectionRadius };
             newCoord = rotate(center, newCoord, diffAngle)
-            projectedCoords.push(newCoord);
+            projected.coords.push(newCoord);
         })
 
-        let reversed = projectedCoords.splice(0, 1);
-        projectedCoords.push(reversed[0]);
-        sh.projectedCoords = projectedCoords;
+        let reversed = projected.coords.splice(0, 1);
+        projected.coords.push(reversed[0]);
+        sh.projected = projected;
         sh.count = 0;
     }
 }

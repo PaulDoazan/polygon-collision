@@ -31,7 +31,7 @@ export default function root(stage) {
     stage.addChild(clickArea);
 
     stage.on('changeCharacter', (e) => {
-        changeCharacter(e, stage, container);
+        //changeCharacter(e, stage, container);
     })
 }
 
@@ -42,7 +42,7 @@ function changeCharacter(e, stage, container) {
     let nextCharacter = characters[indexCharacter];
     stage.polygons.map((polygon, index) => {
         if (index >= nextCharacter.default.length) return;
-        polygon.coords = polygon.projectedCoords = nextCharacter.default[index].coords;
+        polygon.coords = polygon.projected = nextCharacter.default[index].coords;
         polygon.color = nextCharacter.default[index].color;
     })
 
