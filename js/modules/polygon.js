@@ -75,7 +75,7 @@ export default function polygon(polygon, stage, newProjectedCoords) {
 }
 
 function onTargetDown(e, sh) {
-    //detectCollision(e, sh);
+    //detectCollision(e, sh); unnecessary
 }
 
 function onTargetMove(e, sh) {
