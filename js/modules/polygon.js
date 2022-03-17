@@ -1,53 +1,55 @@
+let side = 29;
 let colors = ["#063e7b", "#ececd1", "#f0ce57", "#f45a3c", "#f09548"]
 let maxCount = 120;
 let strStyle = 1;
 
-export default function polygon(props, stage, newProjected) {
-    this.properties = props;
+export default function polygon(polygon, stage, newProjectedCoords) {
+    let coords = polygon.coords;
     let gr = new createjs.Graphics();
     let sh = new createjs.Shape(gr);
 
     let strokeColor = 'rgba(0,0,0,0.5)';
 
     // let fillColor = colors[getRandomIntInclusive(0, colors.length - 1)];
-    let fillColor = props.color;
+    let fillColor = polygon.color;
     if (strStyle) {
         gr.setStrokeStyle(strStyle);
         gr.beginStroke(fillColor);
     }
     gr.beginFill(fillColor);
-    gr.moveTo(this.properties.coords[0].x, this.properties.coords[0].y);
+    gr.moveTo(coords[0].x, coords[0].y);
 
-    this.properties.coords.map((coord, index) => {
+    coords.map((coord, index) => {
         if (index > 0) {
             gr.lineTo(coord.x, coord.y);
         }
     })
 
     sh.on('tick', updateShape)
+    sh.side = side;
 
-    if (newProjected) {
+    if (newProjectedCoords) {
         let reversed = [];
-        this.properties.coords.map((coord, index) => {
+        coords.map((coord, index) => {
             if (index > 0) {
-                reversed.push({ coords: { x: coord.x, y: coord.y } });
+                reversed.push({ x: coord.x, y: coord.y });
             }
         })
-        reversed.push({ coords: { x: this.properties.coords[0].x, y: this.properties.coords[0].y } });
+        reversed.push({ x: coords[0].x, y: coords[0].y });
 
         let random = getRandomIntInclusive(50, 200);
         let angle = getRandomIntInclusive(0, 314);
 
         reversed.map((r) => {
-            r.coords.x += Math.cos(angle / 100) * random;
-            r.coords.y += Math.sin(angle / 100) * random;
+            r.x += Math.cos(angle / 100) * random;
+            r.y += Math.sin(angle / 100) * random;
         })
-        sh.updated = { coords: reversed };
+        sh.updatedCoords = reversed;
     } else {
-        sh.projectedProps = this.properties;
+        sh.projectedCoords = coords;
     }
 
-    sh.props = this.properties;
+    sh.coords = coords;
     sh.fillColor = sh.color = fillColor;
     sh.strokeColor = strokeColor;
     sh.unit = 1;
@@ -77,8 +79,8 @@ function onTargetMove(e, sh) {
 
 function onTargetUp(e, sh) {
     sh.count = 0;
-    //if (sh.projected && sh.projected[0].x !== sh.coords[0].y && sh.projected[0].y !== sh.coords[0].y) sh.count = 0;
-    sh.projectedProps = sh.props;
+    //if (sh.projectedCoords && sh.projectedCoords[0].x !== sh.coords[0].y && sh.projectedCoords[0].y !== sh.coords[0].y) sh.count = 0;
+    sh.projectedCoords = sh.coords;
     sh.fillColor = sh.color;
 }
 
@@ -86,22 +88,22 @@ function updateShape(e) {
     let tg = e.currentTarget;
     let g = tg.graphics;
 
-    if (tg.projectedProps) {
+    if (tg.projectedCoords) {
         if (tg.count < maxCount) {
             tg.count++;
             let factor = easeOutQuint(tg.count / maxCount);
-            let starting;
+            let startingCoords;
 
-            if (tg.updated) {
-                starting = tg.updated;
+            if (tg.updatedCoords) {
+                startingCoords = tg.updatedCoords;
             } else {
-                starting = tg.props;
+                startingCoords = tg.coords;
             }
 
             tg.interCoords = [];
 
-            tg.projectedProps.coords.map((projectedCoord, i) => {
-                tg.interCoords.push({ x: starting.coords[i].x + (projectedCoord.x - starting.coords[i].x) * factor, y: starting.coords[i].y + (projectedCoord.y - starting.coords[i].y) * factor });
+            tg.projectedCoords.map((projected, i) => {
+                tg.interCoords.push({ x: startingCoords[i].x + (projected.x - startingCoords[i].x) * factor, y: startingCoords[i].y + (projected.y - startingCoords[i].y) * factor });
             })
 
             g.clear();
@@ -116,35 +118,35 @@ function updateShape(e) {
                 }
             })
         } else {
-            tg.updated = tg.projectedProps;
-            tg.projectedProps = tg.interCoords = null;
+            tg.updatedCoords = tg.projectedCoords;
+            tg.projectedCoords = tg.interCoords = null;
             tg.count = 0;
         }
     }
 }
 
 function detectCollision(e, sh) {
-    let current = { coords: [] };
+    let currentCoords;
     if (sh.interCoords) {
-        current.coords = sh.interCoords;
-        sh.updated.coords = sh.interCoords;
+        currentCoords = sh.interCoords;
+        sh.updatedCoords = sh.interCoords;
         sh.count = 0;
-    } else if (sh.updated) {
-        current = sh.updated;
+    } else if (sh.updatedCoords) {
+        currentCoords = sh.updatedCoords;
     } else {
-        current = sh.props;
+        currentCoords = sh.coords;
     }
     // if the distance is less than the sum of the circle's
     // radii, the circles are touching!
 
-    let collision = polygonCircle(current.coords, e.coords.x, e.coords.y, e.radius);
+    let collision = polygonCircle(currentCoords, e.coords.x, e.coords.y, e.radius);
     if (collision) {
         let dx = e.coords.x - (collision.x);
         let dy = e.coords.y - (collision.y);
         let distance = Math.sqrt((dx * dx) + (dy * dy));
 
         // projection
-        let projectedProps = { coords: [] };
+        let projectedCoords = [];
         let projectionRadius = 30 * (1 + 5 * e.speed);
         let random = getRandomIntInclusive(5, 10);
         let unit = getRandomIntInclusive(0, 1);
@@ -155,31 +157,31 @@ function detectCollision(e, sh) {
         let springBackX = Math.cos(e.angle) * (e.radius - distance) * 2;
         let springBackY = Math.sin(e.angle) * (e.radius - distance) * 2;
 
-        let springedBack = { coords: [] };
+        let springedBackCoords = [];
 
-        current.coords.map((coord) => {
-            springedBack.coords.push({ x: coord.x + springBackX, y: coord.y + springBackY });
+        currentCoords.map((coord) => {
+            springedBackCoords.push({ x: coord.x + springBackX, y: coord.y + springBackY });
         })
 
-        sh.updated = springedBack;
+        sh.updatedCoords = springedBackCoords;
 
         //rotation
-        let center = get_polygon_centroid(current.coords);
+        let center = get_polygon_centroid(currentCoords);
         let ccx = center.x - (collision.x);
         let ccy = center.y - (collision.y);
 
         let angleCollisionCenter = Math.atan2(ccy, ccx);
         let diffAngle = e.angle - angleCollisionCenter;
 
-        current.coords.map((coord) => {
+        currentCoords.map((coord) => {
             let newCoord = { x: coord.x + springBackX + Math.cos(angle) * projectionRadius, y: coord.y + springBackY + Math.sin(angle) * projectionRadius };
             newCoord = rotate(center, newCoord, diffAngle)
-            projectedProps.coords.push(newCoord);
+            projectedCoords.push(newCoord);
         })
 
-        let reversed = projectedProps.coords.splice(0, 1);
-        projectedProps.coords.push(reversed[0]);
-        sh.projectedProps = projectedProps;
+        let reversed = projectedCoords.splice(0, 1);
+        projectedCoords.push(reversed[0]);
+        sh.projectedCoords = projectedCoords;
         sh.count = 0;
     }
 }

@@ -6,6 +6,7 @@ import poirot from '../json/poirot.json' assert { type: "json" };
 import woki from '../json/woki.json' assert { type: "json" };
 //import ducuing from '../json/ducuing.json';
 
+let polygons = [];
 let characters = [ducuing, poirot, dubie, woki];
 let indexCharacter = 0;
 let size = 30;
@@ -18,11 +19,11 @@ let marginY = 200;*/
 export default function root(stage) {
     let container = new createjs.MovieClip();
     stage.addChild(container);
-    stage.polygons = [];
+    stage.polygons = polygons;
 
     characters[0].default.map((shape) => {
         let polygon = new Polygon(shape, stage);
-        stage.polygons.push(polygon);
+        polygons.push(polygon);
         container.addChild(polygon);
     })
 
@@ -41,8 +42,7 @@ function changeCharacter(e, stage, container) {
     let nextCharacter = characters[indexCharacter];
     stage.polygons.map((polygon, index) => {
         if (index >= nextCharacter.default.length) return;
-        polygon.projectedProps = {};
-        polygon.props.coords = polygon.projectedProps.coords = nextCharacter.default[index].coords;
+        polygon.coords = polygon.projectedCoords = nextCharacter.default[index].coords;
         polygon.color = nextCharacter.default[index].color;
     })
 
