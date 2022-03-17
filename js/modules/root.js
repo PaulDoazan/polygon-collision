@@ -39,7 +39,6 @@ function changeCharacter(e, stage, container) {
     if (indexCharacter >= characters.length) indexCharacter = 0;
 
     let nextCharacter = characters[indexCharacter];
-    //console.log(stage.polygons);
     stage.polygons.map((polygon, index) => {
         if (index >= nextCharacter.default.length) return;
         polygon.projectedProps = {};
