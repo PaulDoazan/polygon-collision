@@ -3,6 +3,8 @@ let colors = ["#063e7b", "#ececd1", "#f0ce57", "#f45a3c", "#f09548"]
 let maxCount = 120;
 let strStyle = 1;
 
+// animation of coords work with 4 states : coords, projectedCoords, interCoords, updatedCoords
+
 export default function polygon(polygon, stage, newProjectedCoords) {
     let coords = polygon.coords;
     let gr = new createjs.Graphics();
@@ -45,8 +47,11 @@ export default function polygon(polygon, stage, newProjectedCoords) {
             r.y += Math.sin(angle / 100) * random;
         })
         sh.updatedCoords = reversed;
+        sh.updatedColor = fillColor;
     } else {
         sh.projectedCoords = coords;
+        sh.projectedColor = fillColor;
+        sh.updatedColor = fillColor;
     }
 
     sh.coords = coords;
@@ -81,6 +86,7 @@ function onTargetUp(e, sh) {
     sh.count = 0;
     //if (sh.projectedCoords && sh.projectedCoords[0].x !== sh.coords[0].y && sh.projectedCoords[0].y !== sh.coords[0].y) sh.count = 0;
     sh.projectedCoords = sh.coords;
+    sh.projectedColor = sh.color;
     sh.fillColor = sh.color;
 }
 
@@ -93,23 +99,54 @@ function updateShape(e) {
             tg.count++;
             let factor = easeOutQuint(tg.count / maxCount);
             let startingCoords;
+            let startingColor;
 
             if (tg.updatedCoords) {
                 startingCoords = tg.updatedCoords;
+                startingColor = tg.updatedColor;
             } else {
                 startingCoords = tg.coords;
+                startingColor = tg.color;
             }
 
             tg.interCoords = [];
+            tg.interColor;
 
             tg.projectedCoords.map((projected, i) => {
                 tg.interCoords.push({ x: startingCoords[i].x + (projected.x - startingCoords[i].x) * factor, y: startingCoords[i].y + (projected.y - startingCoords[i].y) * factor });
             })
 
+
+            let startingRGB = hexToRgb(startingColor);
+            let startRGB = startingRGB.substring(
+                startingRGB.indexOf('(') + 1,
+                startingRGB.lastIndexOf(')')
+            ).split(/,\s*/),
+                startRed = Number(startRGB[0]),
+                startGreen = Number(startRGB[1]),
+                startBlue = Number(startRGB[2]);
+
+            let projectionRGB = hexToRgb(tg.projectedColor);
+            let projectedRGB = projectionRGB.substring(
+                projectionRGB.indexOf('(') + 1,
+                projectionRGB.lastIndexOf(')')
+            ).split(/,\s*/),
+                projectedRed = Number(projectedRGB[0]),
+                projectedGreen = Number(projectedRGB[1]),
+                projectedBlue = Number(projectedRGB[2]);
+
+            let interR = Math.floor(startRed + (projectedRed - startRed) * factor);
+            let interG = Math.floor(startGreen + (projectedGreen - startGreen) * factor);
+            let interB = Math.floor(startBlue + (projectedBlue - startBlue) * factor);
+
+            tg.interColor = `rgb(${ interR },${ interG },${ interB })`;
+
+            console.log(startRed, projectedRed, interR);
+
             g.clear();
             g.setStrokeStyle(strStyle);
-            g.beginStroke(tg.fillColor);
-            g.beginFill(tg.fillColor);
+            g.beginStroke(tg.interColor);
+            g.beginFill(tg.interColor);
             g.moveTo(tg.interCoords[0].x, tg.interCoords[0].y);
 
             tg.interCoords.map((c, index) => {
@@ -119,10 +156,24 @@ function updateShape(e) {
             })
         } else {
             tg.updatedCoords = tg.projectedCoords;
-            tg.projectedCoords = tg.interCoords = null;
+            tg.updatedColor = tg.projectedColor;
+            tg.projectedCoords = tg.interCoords = tg.projectedColor = tg.interColor = null;
             tg.count = 0;
         }
     }
+}
+
+function hexToRgb(hex) {
+    if (hex.includes("#")) {
+        let result = hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
+            , (m, r, g, b) => '#' + r + r + g + g + b + b)
+            .substring(1).match(/.{2}/g)
+            .map(x => parseInt(x, 16));
+
+        return `rgba(${ result[0] }, ${ result[1] }, ${ result[2] }, 1)`;
+    }
+
+    return hex;
 }
 
 function detectCollision(e, sh) {
@@ -130,6 +181,7 @@ function detectCollision(e, sh) {
     if (sh.interCoords) {
         currentCoords = sh.interCoords;
         sh.updatedCoords = sh.interCoords;
+        sh.updatedColor = sh.interColor;
         sh.count = 0;
     } else if (sh.updatedCoords) {
         currentCoords = sh.updatedCoords;
@@ -182,6 +234,8 @@ function detectCollision(e, sh) {
         let reversed = projectedCoords.splice(0, 1);
         projectedCoords.push(reversed[0]);
         sh.projectedCoords = projectedCoords;
+        sh.projectedColor = sh.color;
+        sh.updatedColor = sh.color;
         sh.count = 0;
     }
 }
